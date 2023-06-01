@@ -21,7 +21,7 @@ export default function Trainning() {
   function gotResult(e) {
     setResult('--');
     const { target } = e;
-    target.files.forEach((file) => {
+    Array.from(target.files).forEach((file) => {
       let img = new Image();
       img.src = window.URL.createObjectURL(file);
       img.onload = () => {
@@ -53,7 +53,7 @@ export default function Trainning() {
   }
   const handleImage = (e) => {
     const { target } = e;
-    target.files.forEach((file) => {
+    Array.from(target.files).forEach((file) => {
       let img = new Image();
       img.src = window.URL.createObjectURL(file);
       img.onload = () => {
@@ -68,13 +68,13 @@ export default function Trainning() {
         <h1>ML5 version:{version} </h1>
         <label>当前文件打标签</label>
         <input type="text" label="标签" onInput={hanldeInput}></input>
-        <input type="file" accept="image/*" onChange={handleImage}></input>
+        <input type="file" accept="image/*" onChange={handleImage} multiple></input>
         <button onClick={train}>训练</button>
         {training? <p>训练中...</p> : <p></p>}
         <label>测试识别结果</label>
         <input ref={inputRef}  type="file" accept="image/*" onChange={gotResult}></input>
         <p>识别结果:{result}</p>
-        <button onClick={save}>保存</button>
+        <button onClick={save}>保存模型</button>
     </>
   );
 }
