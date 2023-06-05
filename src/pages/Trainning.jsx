@@ -8,18 +8,26 @@ export default function Trainning() {
   const [classifier, setClassifier] = useState(null);
   const [result, setResult] = useState("--");
   const [training, setTraining] = useState(false);
+  const [loading, setLoading] = useState(false);
   let currentLabel = "";
   const setup = () => {
-    const featureExtractor = ml5.featureExtractor("MobileNet", () => {
+    setLoading(true);
+    const featureExtractor = ml5.featureExtractor("MobileNet", (e) => {
+      setLoading(false);
+      if (e?.message) {
+        console.log("Model failed", e);
+        return;
+      }
       console.log("Model Ready");
+
+      setClassifier(featureExtractor.classification());
     });
-    setClassifier(featureExtractor.classification());
   };
   useEffect(() => {
     setup();
   }, []);
   function gotResult(e) {
-    setResult('--');
+    setResult("--");
     const { target } = e;
     Array.from(target.files).forEach((file) => {
       let img = new Image();
@@ -32,7 +40,7 @@ export default function Trainning() {
         });
       };
     });
-    inputRef.current.value =  null;
+    inputRef.current.value = null;
   }
 
   function train() {
@@ -65,16 +73,29 @@ export default function Trainning() {
   };
   return (
     <>
-        <h1>ML5 version:{version} </h1>
-        <label>当前文件打标签</label>
-        <input type="text" label="标签" onInput={hanldeInput}></input>
-        <input type="file" accept="image/*" onChange={handleImage} multiple></input>
-        <button onClick={train}>训练</button>
-        {training? <p>训练中...</p> : <p></p>}
-        <label>测试识别结果</label>
-        <input ref={inputRef}  type="file" accept="image/*" onChange={gotResult}></input>
-        <p>识别结果:{result}</p>
-        <button onClick={save}>保存模型</button>
+      <h1>ML5 version:{version} </h1>
+      <h4>
+        {loading ? "加载中..." : classifier ? "模型加载完成" : "模型加载失败"}
+      </h4>
+      <label>当前文件打标签</label>
+      <input type="text" label="标签" onInput={hanldeInput}></input>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleImage}
+        multiple
+      ></input>
+      <button onClick={train}>训练</button>
+      {training ? <p>训练中...</p> : <p></p>}
+      <label>测试识别结果</label>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        onChange={gotResult}
+      ></input>
+      <p>识别结果:{result}</p>
+      <button onClick={save}>保存模型</button>
     </>
   );
 }
